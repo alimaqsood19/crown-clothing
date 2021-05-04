@@ -9,8 +9,11 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { getUser } from './helpers/authHelper';
 import { Hub } from '@aws-amplify/core';
+import { connect } from 'react-redux';
+import { setCurrentUser } from './redux/user/user.actions';
 
-const App = () => {
+const App = ({ setCurrentUser }) => {
+  //TODO: REMOVE state
   const [user, setUser] = useState(null);
   const [cart, setCart] = useState(null);
 
@@ -22,12 +25,14 @@ const App = () => {
           getUser().then((user) => {
             if (user) {
               setUser(user.email);
+              setCurrentUser(user.email);
               setCart(user.cart);
             }
           });
           break;
         case 'signOut':
           setUser(null);
+          setCurrentUser(null);
           break;
         case 'signIn_failure':
           console.log('Sign in failure', data);
@@ -38,6 +43,7 @@ const App = () => {
     getUser().then((user) => {
       if (user) {
         setUser(user.email);
+        setCurrentUser(user.email);
         setCart(user.cart);
       }
     });
@@ -45,7 +51,7 @@ const App = () => {
 
   return (
     <div className='App'>
-      <Header user={user} cart={cart} />
+      <Header />
       <Switch>
         <Route exact path='/' component={Homepage} />
         <Route path='/shop' component={ShopPage} />
@@ -55,4 +61,8 @@ const App = () => {
   );
 };
 
-export default App;
+const mapDispatchToProps = (dispatch) => ({
+  setCurrentUser: (user) => dispatch(setCurrentUser(user)),
+});
+
+export default connect(null, mapDispatchToProps)(App);
