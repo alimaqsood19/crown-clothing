@@ -1,6 +1,6 @@
 import './App.css';
 import './amplifyConfigure';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 import Homepage from './pages/homepage/homepage.component';
 import ShopPage from './pages/shop/shoppage.component';
 import Header from './components/header/header.component';
@@ -55,14 +55,21 @@ const App = ({ setCurrentUser }) => {
       <Switch>
         <Route exact path='/' component={Homepage} />
         <Route path='/shop' component={ShopPage} />
-        <Route path='/signin' component={LoginPage} />
+        <Route
+          path='/signin'
+          render={() => (user ? <Redirect to='/' /> : <LoginPage />)}
+        />
       </Switch>
     </div>
   );
 };
 
+const mapStateToProps = ({ user }) => ({
+  user: user.currentUser,
+});
+
 const mapDispatchToProps = (dispatch) => ({
   setCurrentUser: (user) => dispatch(setCurrentUser(user)),
 });
 
-export default connect(null, mapDispatchToProps)(App);
+export default connect(mapStateToProps, mapDispatchToProps)(App);
