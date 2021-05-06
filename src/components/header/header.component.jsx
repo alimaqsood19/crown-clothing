@@ -6,6 +6,9 @@ import { Auth } from '@aws-amplify/auth';
 import { connect } from 'react-redux';
 import CartIcon from '../cart-icon/cart-icon.component';
 import CartDropdown from '../cart-dropdown/cart-dropdown.component';
+import { createStructuredSelector } from 'reselect';
+import { selectCartHidden } from '../../redux/cart/cart.selectors';
+import { selectCurrentUser } from '../../redux/user/user.selectors';
 
 const Header = ({ user, hidden }) => (
   <div className='header'>
@@ -34,9 +37,9 @@ const Header = ({ user, hidden }) => (
   </div>
 );
 
-const mapStateToProps = ({ user: { currentUser }, cart: { hidden } }) => ({
-  user: currentUser,
-  hidden,
+const mapStateToProps = createStructuredSelector({
+  user: selectCurrentUser,
+  hidden: selectCartHidden,
 });
 
 export default connect(mapStateToProps)(Header);

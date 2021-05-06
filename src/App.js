@@ -5,12 +5,15 @@ import Homepage from './pages/homepage/homepage.component';
 import ShopPage from './pages/shop/shoppage.component';
 import Header from './components/header/header.component';
 import LoginPage from './pages/loginpage/loginpage.component';
+import CheckoutPage from './pages/checkout/checkout.component';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { getUser } from './helpers/authHelper';
 import { Hub } from '@aws-amplify/core';
 import { connect } from 'react-redux';
 import { setCurrentUser } from './redux/user/user.actions';
+import { selectCurrentUser } from './redux/user/user.selectors';
+import { createStructuredSelector } from 'reselect';
 
 const App = ({ setCurrentUser }) => {
   //TODO: REMOVE state
@@ -55,6 +58,7 @@ const App = ({ setCurrentUser }) => {
       <Switch>
         <Route exact path='/' component={Homepage} />
         <Route path='/shop' component={ShopPage} />
+        <Route exact path='/checkout' component={CheckoutPage} />
         <Route
           path='/signin'
           render={() => (user ? <Redirect to='/' /> : <LoginPage />)}
@@ -64,8 +68,8 @@ const App = ({ setCurrentUser }) => {
   );
 };
 
-const mapStateToProps = ({ user }) => ({
-  user: user.currentUser,
+const mapStateToProps = createStructuredSelector({
+  user: selectCurrentUser,
 });
 
 const mapDispatchToProps = (dispatch) => ({
