@@ -7,49 +7,16 @@ import Header from './components/header/header.component';
 import LoginPage from './pages/loginpage/loginpage.component';
 import CheckoutPage from './pages/checkout/checkout.component';
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { getUser } from './helpers/authHelper';
 import { Hub } from '@aws-amplify/core';
 import { connect } from 'react-redux';
-import { setCurrentUser } from './redux/user/user.actions';
+import { setCurrentUserStart } from './redux/user/user.actions';
 import { selectCurrentUser } from './redux/user/user.selectors';
 import { createStructuredSelector } from 'reselect';
 
-const App = ({ setCurrentUser }) => {
-  //TODO: REMOVE state
-  const [user, setUser] = useState(null);
-  const [cart, setCart] = useState(null);
-
+const App = ({ setCurrentUserStart, currentUser }) => {
   useEffect(() => {
-    Hub.listen('auth', ({ payload: { event, data } }) => {
-      console.log(event);
-      switch (event) {
-        case 'signIn':
-          getUser().then((user) => {
-            if (user) {
-              setUser(user.email);
-              setCurrentUser(user.email);
-              setCart(user.cart);
-            }
-          });
-          break;
-        case 'signOut':
-          setUser(null);
-          setCurrentUser(null);
-          break;
-        case 'signIn_failure':
-          console.log('Sign in failure', data);
-          break;
-      }
-    });
-
-    getUser().then((user) => {
-      if (user) {
-        setUser(user.email);
-        setCurrentUser(user.email);
-        setCart(user.cart);
-      }
-    });
+    setCurrentUserStart();
   }, []);
 
   return (
@@ -61,7 +28,7 @@ const App = ({ setCurrentUser }) => {
         <Route exact path='/checkout' component={CheckoutPage} />
         <Route
           path='/signin'
-          render={() => (user ? <Redirect to='/' /> : <LoginPage />)}
+          render={() => (currentUser ? <Redirect to='/' /> : <LoginPage />)}
         />
       </Switch>
     </div>
@@ -69,11 +36,11 @@ const App = ({ setCurrentUser }) => {
 };
 
 const mapStateToProps = createStructuredSelector({
-  user: selectCurrentUser,
+  currentUser: selectCurrentUser,
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  setCurrentUser: (user) => dispatch(setCurrentUser(user)),
+  setCurrentUserStart: () => dispatch(setCurrentUserStart()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

@@ -4,15 +4,8 @@ import CustomButton from '../custom-button/custom-button.component';
 import { Auth } from '@aws-amplify/auth';
 import './sign-in.styles.scss';
 import { withRouter } from 'react-router-dom';
-
-async function signIn(username, password) {
-  try {
-    const user = await Auth.signIn(username, password);
-    console.log(user);
-  } catch (error) {
-    console.log('error signing in', error);
-  }
-}
+import { connect } from 'react-redux';
+import { signInStart } from '../../redux/user/user.actions';
 
 class SignIn extends Component {
   constructor() {
@@ -24,10 +17,11 @@ class SignIn extends Component {
     };
   }
 
-  handleSubmit = async (event) => {
+  handleSubmit = (event) => {
     event.preventDefault();
-    await signIn(this.state.email, this.state.password);
-    this.props.history.push('/');
+    const { signInStart } = this.props;
+    const { email, password } = this.state;
+    signInStart(email, password);
   };
 
   handleChange = (event) => {
@@ -65,4 +59,8 @@ class SignIn extends Component {
   }
 }
 
-export default withRouter(SignIn);
+const mapDispatchToProps = (dispatch) => ({
+  signInStart: (email, password) => dispatch(signInStart({ email, password })),
+});
+
+export default withRouter(connect(null, mapDispatchToProps)(SignIn));

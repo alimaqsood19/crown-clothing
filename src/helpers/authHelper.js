@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Auth } from '@aws-amplify/auth';
 
-const getCartInformation = ({
+export const getCartInformation = ({
   attributes: { email },
   signInUserSession: {
     accessToken: { jwtToken },
@@ -11,10 +11,11 @@ const getCartInformation = ({
     .get(`/api/users/${email}`, {
       headers: { Authorization: `token ${jwtToken}` },
     })
-    .then(({ data: cart }) => {
+    .then(({ data }) => {
+      const { carts, email, id } = data[0];
       return {
-        cart,
-        email,
+        cart: carts,
+        user: { email, id },
       };
     })
     .catch((err) => console.log(err));
