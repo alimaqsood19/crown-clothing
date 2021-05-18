@@ -32,3 +32,32 @@ export const signOut = (err) => ({
   type: UserActionTypes.SIGN_OUT,
   payload: err,
 });
+
+export const signUpStart = (email, password) => ({
+  type: UserActionTypes.SIGN_UP_START,
+  payload: { email, password },
+});
+
+export const signUpSuccess = (email) => ({
+  type: UserActionTypes.SIGN_UP_SUCCESS,
+  payload: email,
+});
+
+export const signUpError = (err) => ({
+  type: UserActionTypes.SIGN_UP_ERROR,
+  payload: err,
+});
+
+export const confirmationStart = (email, code) => ({
+  type: UserActionTypes.CONFIRMATION_START,
+  payload: { email, code },
+});
+
+export const confirmationSuccess = () => ({
+  type: UserActionTypes.CONFIRMATION_SUCCESS,
+});
+
+export const confirmationError = (err) => ({
+  type: UserActionTypes.CONFIRMATION_ERROR,
+  payload: err,
+});

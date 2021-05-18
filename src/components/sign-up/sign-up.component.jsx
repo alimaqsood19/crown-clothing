@@ -5,27 +5,12 @@ import axios from 'axios';
 import { Auth } from '@aws-amplify/auth';
 import './sign-up.styles.scss';
 import { withRouter } from 'react-router-dom';
+import { signUpStart, confirmationStart } from '../../redux/user/user.actions';
+import { selectConfirmationRequired } from '../../redux/user/user.selectors';
+import { createStructuredSelector } from 'reselect';
+import { connect } from 'react-redux';
 
-async function signUp(username, password) {
-  try {
-    const { userConfirmed } = await Auth.signUp({
-      username,
-      password,
-    });
-    return userConfirmed;
-  } catch (error) {
-    console.log('error signing up:', error);
-  }
-}
-
-async function confirmSignUp(username, code) {
-  try {
-    const data = await Auth.confirmSignUp(username, code);
-  } catch (error) {
-    console.log('error confirming sign up', error);
-  }
-}
-
+//TODO: Move to SAGAS
 async function resendConfirmationCode(username) {
   try {
     await Auth.resendSignUp(username);
@@ -43,25 +28,18 @@ class SignUp extends React.Component {
       email: '',
       password: '',
       code: '',
-      confirmationRequired: false,
     };
   }
 
-  handleSubmit = async (event) => {
+  handleSubmit = (event) => {
     event.preventDefault();
-    try {
-      await signUp(this.state.email, this.state.password);
-    } catch (err) {
-      console.error(err);
-    }
-
-    this.setState({ password: '', confirmationRequired: true });
+    this.props.signUpStart(this.state.email, this.state.password);
+    this.setState({ password: '' });
   };
 
-  handleVerify = async (event) => {
+  handleVerify = (event) => {
     event.preventDefault();
-    await confirmSignUp(this.state.email, this.state.code);
-    await axios.post('/api/users', { email: this.state.email });
+    this.props.confirmationStart(this.state.email, this.state.code);
     this.props.history.push('/');
   };
 
@@ -75,8 +53,9 @@ class SignUp extends React.Component {
   };
 
   render() {
+    const { confirmationRequired } = this.props;
     const { email, password, code } = this.state;
-    if (this.state.confirmationRequired) {
+    if (confirmationRequired) {
       return (
         <div className='sign-up'>
           <h2>Verify your account</h2>
@@ -143,4 +122,13 @@ class SignUp extends React.Component {
   }
 }
 
-export default withRouter(SignUp);
+const mapStateToProps = createStructuredSelector({
+  confirmationRequired: selectConfirmationRequired,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  signUpStart: (email, password) => dispatch(signUpStart(email, password)),
+  confirmationStart: (email, code) => dispatch(confirmationStart(email, code)),
+});
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(SignUp));

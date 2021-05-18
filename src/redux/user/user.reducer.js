@@ -3,6 +3,7 @@ const INITIAL_STATE = {
   currentUser: null,
   error: null,
   isFetching: false,
+  confirmationRequired: false,
 };
 
 const userReducer = (state = INITIAL_STATE, action) => {
@@ -18,12 +19,6 @@ const userReducer = (state = INITIAL_STATE, action) => {
         currentUser: action.payload,
         isFetching: false,
       };
-    case UserActionTypes.SET_CURRENT_USER_ERROR:
-      return {
-        ...state,
-        currentUser: null,
-        isFetching: false,
-      };
     case UserActionTypes.SIGN_IN_START:
       return {
         ...state,
@@ -37,6 +32,9 @@ const userReducer = (state = INITIAL_STATE, action) => {
         isFetching: false,
       };
     case UserActionTypes.SIGN_IN_ERROR:
+    case UserActionTypes.CONFIRMATION_ERROR:
+    case UserActionTypes.SIGN_UP_ERROR:
+    case UserActionTypes.SET_CURRENT_USER_ERROR:
       return {
         ...state,
         error: action.payload,
@@ -47,6 +45,16 @@ const userReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         currentUser: null,
+      };
+    case UserActionTypes.SIGN_UP_SUCCESS:
+      return {
+        ...state,
+        confirmationRequired: true,
+      };
+    case UserActionTypes.CONFIRMATION_SUCCESS:
+      return {
+        ...state,
+        confirmationRequired: false,
       };
     default:
       return state;
